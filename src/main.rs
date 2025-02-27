@@ -1,3 +1,124 @@
+#![warn(clippy::all, rust_2018_idioms)]
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
+use axum::{
+    routing::get,
+    Router,
+};
+
+
 fn main() {
-    println!("Hello, world!");
+    
+    let args: Vec<String> = std::env::args().collect();
+    if let Some(arg) = args.get(1)
+    {
+        #[cfg(debug_assertions)]
+        println!("Starting with key: \n{}", arg);
+        api(Key::Some(arg.to_string()));
+
+    } else {
+        #[cfg(debug_assertions)]
+        println!("Starting without key");
+        api(Key::None);
+    }
+
+
+}
+
+#[tokio::main]
+async fn api(key: Key)
+{
+
+    let app: Router = Router::new()
+    .route("/test", get(test));
+
+
+    match key {
+        Key::None => {
+            let api_routes: Router = Router::new()
+            .merge(app)
+            .merge(app_router());
+            let listener = tokio::net::TcpListener::bind("0.0.0.0:5002").await.unwrap();
+            axum::serve(listener, api_routes).await.unwrap();
+        },
+        Key::Some(key) => {
+            let api_routes: Router = Router::new()
+            .merge(app)
+            .merge(app_router_keyed(key));
+            let listener = tokio::net::TcpListener::bind("0.0.0.0:5002").await.unwrap();
+            axum::serve(listener, api_routes).await.unwrap();
+        }
+    }
+
+
+
+
+}
+
+fn app_router() -> Router
+{
+
+    return Router::new()
+    .route("/api/v1/shutdown", get(shutdown))
+    .route("/api/v1/restart", get(restart))
+    .route("/api/v1/quit", get(quit))
+
+}
+
+fn app_router_keyed(key: String) -> Router
+{
+
+    return Router::new()
+    .route(&format!("/api/v1/{}/shutdown", key), get(shutdown))
+    .route(&format!("/api/v1/{}/restart", key), get(restart))
+    .route(&format!("/api/v1/{}/quit", key), get(quit))
+
+}
+
+
+
+
+async fn test() -> String
+{
+    "Connection Successful".to_string()
+}
+
+async fn quit()
+{
+    std::process::exit(0);
+}
+
+
+
+async fn shutdown()
+{
+    #[cfg(target_os="windows")]
+    let _ = std::process::Command::new("shutdown")
+        .arg("/p")
+        .spawn();
+
+    #[cfg(target_os="linux")]
+    let _ = std::process::Command::new("shutdown")
+        .arg("now")
+        .spawn();
+}
+
+async fn restart()
+{
+    #[cfg(target_os="windows")]
+    let _ = std::process::Command::new("shutdown")
+        .arg("/t")
+        .arg("1")
+        .arg("/r")
+        .spawn();
+
+    #[cfg(target_os="linux")]
+    let _ = std::process::Command::new("reboot")
+        .arg("now")
+        .spawn();
+}
+
+enum Key
+{
+    Some(String),
+    None
 }
