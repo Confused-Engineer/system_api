@@ -25,6 +25,5 @@ This will make the commands only work with the following pattern:
  - localhost:5002/api/v1/key123/quit
 
 # To-Do:
- - Maybe implement a few commands (--help, for example) to show basic usage in command line; this project was meant as an easy solution to a problem
  - Package a compiled executable for both Windows and Linux
  - Include a template or script for setting up as a Linux service. Windows can just place the exe in "shell:startup" in File Explorer  
