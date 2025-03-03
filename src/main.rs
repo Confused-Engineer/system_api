@@ -1,19 +1,60 @@
 #![warn(clippy::all, rust_2018_idioms)]
-#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] 
+
 use axum::{
     routing::get,
     Router,
 };
 
+const HELP: &str = include_str!("../assets/help.txt");
+#[cfg(target_os="linux")]
+const SETUP: &str = include_str!("../assets/setup_linux.txt");
+#[cfg(target_os="windows")]
+const SETUP: &str = include_str!("../assets/setup_windows.txt");
 
 fn main() {
     
     let args: Vec<String> = std::env::args().collect();
+
     if let Some(arg) = args.get(1)
     {
-        #[cfg(debug_assertions)]
-        println!("Starting with key: \n{}", arg);
-        api(Key::Some(arg.to_string()));
+
+        match arg.as_str() {
+            "--help" => 
+            {
+                println!("{}", HELP)
+            },
+            "-h" => 
+            {
+                println!("{}", HELP)
+            },
+            "/help" => 
+            {
+                println!("{}", HELP)
+            },
+            "/?" => 
+            {
+                println!("{}", HELP)
+            },
+
+            "--setup" => 
+            {
+                println!("{}", SETUP)
+            },
+
+            "/setup" => 
+            {
+                println!("{}", SETUP)
+            },
+
+            _ => 
+            {
+                #[cfg(debug_assertions)]
+                println!("Starting with key: \n{}", arg);
+                api(Key::Some(arg.to_string()));
+            }
+        }
+        
 
     } else {
         #[cfg(debug_assertions)]

@@ -1,0 +1,42 @@
+Linux Setup Instructions:
+
+-------------------------------------------------------
+1. 
+    Place file somewhere such as:
+        /bin/system_api
+
+    Using: 
+        sudo cp /current/bin/path /bin/system_api
+-------------------------------------------------------
+2. 
+    Make a file:
+    sudo touch /etc/systemd/system/systemapi.service
+
+    Insert the contents into the file with your favorite text editor (nano, vim, etc):
+#############################################################
+[Unit]
+Description=API Service For System Commands Using HTTP
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/bin/system_api
+
+[Install]
+WantedBy=multi-user.target
+#############################################################
+-------------------------------------------------------
+3. 
+    Reload services:
+        sudo systemctl daemon-reload
+    Make services start on boot:
+        sudo systemctl enable systemapi
+    Start Service: 
+        sudo systemctl start systemapi
+    Check Service Status:
+        sudo systemctl status systemapi
+-------------------------------------------------------

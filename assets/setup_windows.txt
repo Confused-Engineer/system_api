@@ -1,0 +1,7 @@
+Option 1.
+    If not using a key, place exe in "shell:startup" in File Explorer
+
+Option 2.
+    If using a key, make a .bat file with the contents:
+        "/path/to/exe" secretkey123
+    And place that file in "shell:startup"

@@ -1,0 +1,18 @@
+Description:
+A tool designed to provide basic system commands over HTTP so the device can be controlled with Home Assistant or any device that can make HTTP commands or utilize curl.
+
+Usage:
+    Execute the program by:
+        path/to/file/system_api.exe,
+    Run a command with:
+        curl http://localhost:5002/api/v1/restart
+
+    Execute with a key:
+        path/to/file/system_api.exe secretkey123
+    Run a command with:
+        curl http://localhost:5002/api/v1/secretkey123/restart
+
+Flags:
+
+-h , --help, /help: Displays this message
+--setup, /setup: Displays auto-setup message relative to OS
