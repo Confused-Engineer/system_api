@@ -102,6 +102,9 @@ fn app_router() -> Router
     .route("/api/v1/shutdown", get(shutdown))
     .route("/api/v1/restart", get(restart))
     .route("/api/v1/quit", get(quit))
+    .route("/api/v1/systemctl/restart/gdm3", get(systemctl_restart_gdm3))
+    .route("/api/v1/systemctl/restart/display-manager", get(systemctl_restart_displaymanager))
+    
 
 }
 
@@ -112,6 +115,9 @@ fn app_router_keyed(key: String) -> Router
     .route(&format!("/api/v1/{}/shutdown", key), get(shutdown))
     .route(&format!("/api/v1/{}/restart", key), get(restart))
     .route(&format!("/api/v1/{}/quit", key), get(quit))
+    .route(&format!("/api/v1/{}/systemctl/restart/gdm3", key), get(systemctl_restart_gdm3))
+    .route(&format!("/api/v1/{}/systemctl/restart/display-manager", key), get(systemctl_restart_displaymanager))
+
 
 }
 
@@ -140,6 +146,26 @@ async fn shutdown()
     #[cfg(target_os="linux")]
     let _ = std::process::Command::new("shutdown")
         .arg("now")
+        .spawn();
+}
+
+async fn systemctl_restart_gdm3()
+{
+
+    #[cfg(target_os="linux")]
+    let _ = std::process::Command::new("systemctl")
+        .arg("restart")
+        .arg("gdm3")
+        .spawn();
+}
+
+async fn systemctl_restart_displaymanager()
+{
+
+    #[cfg(target_os="linux")]
+    let _ = std::process::Command::new("systemctl")
+        .arg("restart")
+        .arg("display-manager")
         .spawn();
 }
 
